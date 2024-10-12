@@ -1,0 +1,25 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>{{outputNome}}</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    {{outputDescrizione}}
+  </ion-card-content>
+</ion-card>
+
+<ion-card >
+  <ion-card-header >
+    <ion-card-title>Costo SAN {{outputSAN}}</ion-card-title>
+  </ion-card-header>
+</ion-card>
+
+<ion-row >
+  <ion-col >
+    <ion-button shape="round" color="danger" expand="block" (click)="lancia()" [disabled]="disabled==true">Lancia</ion-button>
+  </ion-col>
+</ion-row>
+<ion-row >
+  <ion-col >
+    <ion-button shape="round" color="primary" expand="block" (click)="indietro()" >Indietro</ion-button>
+  </ion-col>
+</ion-row>
