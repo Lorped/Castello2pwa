@@ -27,6 +27,11 @@ const routes: Routes = [
     ]
   },
   {
+    path: 'tab2',
+    redirectTo: 'tabs/tab2',
+    pathMatch: 'full'
+  },
+  {
     path: '',
     redirectTo: 'tabs/tab1',
     pathMatch: 'full'
@@ -35,5 +40,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
 export class TabsPageRoutingModule {}

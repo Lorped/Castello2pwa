@@ -28,7 +28,7 @@ export class QrscannerPage implements OnInit {
     private loadingCtrl: LoadingController,
     private plt: Platform,
     public oggetto: Oggetto,
-    private router: Router, 
+    public router: Router, 
     public status: Status
   ) { 
     const isInStandaloneMode = () =>
@@ -43,6 +43,8 @@ export class QrscannerPage implements OnInit {
   }
 
   ngAfterViewInit (){
+    
+  
     this.canvasElement = this.canvas?.nativeElement;
     this.canvasContext = this.canvasElement.getContext('2d');
     this.videoElement = this.video?.nativeElement;
@@ -133,8 +135,10 @@ export class QrscannerPage implements OnInit {
           this.status.generico = true;
         }
 
-
+        //alert("Scanned "+ this.oggetto.id);
         this.router.navigate(['/tabs/tab2']);
+        
+      
         //this.showQrToast();
       } else {
         if (this.scanActive) {
