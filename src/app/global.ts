@@ -75,8 +75,14 @@ export class DescOggetto {
     public deltapf = 0;
     public newsan = 0 ;
     public newmiti = 0;
-    public newpf = 0;
+    public newpf = 0; 
   
+    public domanda = '';
+    public r1 = '';
+    public r2 = '';
+    public rispsan = 0;
+    public rispmiti = 0;
+    public risppf = 0;
   }
   
   export class Scan  {
@@ -85,4 +91,10 @@ export class DescOggetto {
     public scan = '';  //identificativo barcode
     public nome = ''; 
     public descrizione = ''; // base
+  }
+
+    export class Messaggio  {
+    public data = '';
+    public testo = ''; // base
+    public url = '';
   }

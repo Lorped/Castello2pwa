@@ -9,7 +9,7 @@
 
 <ion-card *ngIf="newoggetto.descrizione1 != ''">
   <ion-card-header>
-    <ion-card-subtitle>({{user.nomeprofessione}})</ion-card-subtitle>
+    <ion-card-subtitle><span class="gold">({{user.nomeprofessione}})</span></ion-card-subtitle>
   </ion-card-header>
   <ion-card-content>
     {{newoggetto.descrizione1}}
@@ -19,7 +19,7 @@
 
 <ion-card *ngIf="newoggetto.descrizione2 != ''">
   <ion-card-header>
-    <ion-card-subtitle>({{user.nomespecial}})</ion-card-subtitle>
+    <ion-card-subtitle><span class="gold">({{user.nomespecial}})</span></ion-card-subtitle>
   </ion-card-header>
   <ion-card-content>
     {{newoggetto.descrizione2}}
@@ -28,7 +28,7 @@
 
 <ion-card *ngIf="newoggetto.descrizione3 != ''">
   <ion-card-header>
-    <ion-card-subtitle>({{user.descbp}})</ion-card-subtitle>
+    <ion-card-subtitle><span class="gold">({{user.descbp}})</span></ion-card-subtitle>
   </ion-card-header>
   <ion-card-content>
     {{newoggetto.descrizione3}}
@@ -56,8 +56,39 @@
   </ion-card-header>
 </ion-card>
 
-<ion-row>
+<ion-card *ngIf="newoggetto.domanda != ''">
+  <ion-card-header>
+    <ion-card-title>DOMANDA</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    {{newoggetto.domanda}}
+  </ion-card-content>
+  <ion-row>
+    <ion-col class="alc" *ngIf="flagno !== 1">
+      <ion-button  color="danger" (click)="RispSI()" [disabled]="flagsi === 1">SI</ion-button><span *ngIf="flagsi === 1"> {{newoggetto.r1}}</span>
+    </ion-col>
+    <ion-col class="alc" *ngIf="flagsi !== 1">
+      <ion-button  color="primary" (click)="RispNO()" [disabled]="flagno === 1">NO</ion-button> <span *ngIf="flagno === 1"> {{newoggetto.r2}}</span>
+    </ion-col>
+  </ion-row>
+</ion-card>
+
+<ion-card *ngIf="(newoggetto.rispmiti!=0 || newoggetto.rispsan!=0 || newoggetto.risppf!=0 )&& flagsi === 1 ">
+  <ion-card-header *ngIf="newoggetto.rispsan!=0">
+    <ion-card-title>SAN {{newoggetto.rispsan}}</ion-card-title>
+  </ion-card-header>
+  <ion-card-header *ngIf="newoggetto.rispmiti!=0">
+    <ion-card-title>MITI {{newoggetto.rispmiti}}</ion-card-title>
+  </ion-card-header>
+  <ion-card-header *ngIf="newoggetto.risppf!=0">
+    <ion-card-title>PF {{newoggetto.risppf}}</ion-card-title>
+  </ion-card-header>
+</ion-card>
+
+<ion-row *ngIf="newoggetto.domanda == '' || flagno === 1 || flagsi === 1">
 <ion-col class="alc">
   <ion-button color="primary" (click)="dismiss()">Chiudi</ion-button>
 </ion-col>
 </ion-row>
+
+
