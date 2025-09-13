@@ -5,27 +5,25 @@ import { Status, User } from '../global';
 import { Router } from '@angular/router';
 
 
-// import { FCM } from "@capacitor-community/fcm";
 
-import {
-  FirebaseMessaging,
-  GetTokenOptions,
-} from "@capacitor-firebase/messaging";
-import { Capacitor } from "@capacitor/core";
-import { IonicModule } from "@ionic/angular";
+
+
+
+
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getMessaging, getToken, onMessage , Messaging} from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
+
+
+
 import { environment } from "src/environments/environment";
 
-import { CapacitorConfig } from '@capacitor/cli';
-import { FCM } from "@capacitor-community/fcm";
 
 
-import {
-  ActionPerformed,
-  PushNotificationSchema,
-  PushNotifications,
-  Token,
-} from '@capacitor/push-notifications';
+
+
 import { HttpClient } from '@angular/common/http';
+import { FirebaseApp } from '@angular/fire/compat';
 
 @Component({
   selector: 'app-login',
@@ -42,9 +40,9 @@ export class LoginPage implements OnInit {
   });
 
 
-    
 
-  constructor(public userservice: UserService, private user: User, public router: Router, public status: Status, public http: HttpClient) { }
+
+  constructor(public userservice: UserService, private user: User, public router: Router, public status: Status, public http: HttpClient ,  private mesg: AngularFireMessaging) { }
 
   ngOnInit() {
     var ee = window.localStorage.getItem( "castellouserid" ) ! ;
@@ -104,53 +102,46 @@ export class LoginPage implements OnInit {
 
 
         // Request permission to use push notifications
+
+        provideFirebaseApp(() => initializeApp(environment.firebase));
+        // initializeApp(environment.firebase);
+
+        console.log("Firebase app initialized:");
+
+
+        Notification.requestPermission().then((permission) => {
+          if (permission === 'granted') {
+              console.log('Notification permission granted.');
     
-          FirebaseMessaging.addListener("notificationReceived", (event) => {
-              console.log("notificationReceived: ", { event });
-          });
-          FirebaseMessaging.addListener("notificationActionPerformed", (event) => {
-            console.log("notificationActionPerformed: ", { event });
-          });
-          if (Capacitor.getPlatform() === "web") {
-            navigator.serviceWorker.addEventListener("message", (event: any) => {
-              console.log("serviceWorker message: ", { event });
-              const notification = new Notification(event.data.notification.title, {
-                body: event.data.notification.body,
-              });
-              notification.onclick = (event) => {
-                console.log("notification clicked: ", { event });
-              };
-            });
-          };
+              this.mesg.requestToken.subscribe(
+                (currentToken) => {
+                  if (currentToken) {
+                      console.log("current token:", currentToken);
+                      // Send the token to your server or use it as needed
+                      let updateurl = 'https://www.roma-by-night.it/Castello/wsPHPapp/updateid.php?userid='+ this.user.IDutente+'&id='+currentToken;
+                      this.http.get(updateurl).subscribe(res =>  {
+                        // updated
+                        //alert('Device registered '+currentToken);
+                        console.log("updated");
+                        this.router.navigate(['tabs']);
+                      });
 
-          FirebaseMessaging.requestPermissions().then( result => {
-            if (result.receive === 'granted') { 
-
-              console.log("granted");
-
-              this.getToken().then( (token: any) => {
-
-                console.log("token:", token);
-
-                let updateurl = 'https://www.roma-by-night.it/Castello/wsPHPapp/updateid.php?userid='+ this.user.IDutente+'&id='+token.value;
-                  this.http.get(updateurl)
-                  .subscribe(res =>  {
-                    // updated
-                    //alert('Device registered '+token);
-
+                  } else {
+                    console.log('No registration token available.');
                     this.router.navigate(['tabs']);
-                  });
+                  }
+                },
+                (error) => {
+                  console.log(error);
+                });
+          } else {
+            console.log('Notification permission denied.');
+            this.router.navigate(['tabs']);
+          }
+        });
 
-              });
+          
 
-            } else {
-                // OK 
-                this.router.navigate(['tabs']);
-            }
-          });
-
-
-        this.router.navigate(['tabs']);
 
       }, 
       error => {
@@ -166,24 +157,6 @@ export class LoginPage implements OnInit {
         }
       }
     );
-  }
-
-
-  public async getToken(): Promise<any> {
-
-    console.log("inside get token");
-    const options: GetTokenOptions = {
-      vapidKey: environment.firebase.vapidKey,
-    };
-    if (Capacitor.getPlatform() === "web") {
-      console.log("before registering service worker - web");
-      options.serviceWorkerRegistration =
-        await navigator.serviceWorker.register("firebase-messaging-sw.js", { type: 'module' });
-    }
-    console.log("here");
-    const { token } = await FirebaseMessaging.getToken(options);
-    console.log("get token token ", token);
-    return token;
   }
 
 
