@@ -72,3 +72,6 @@ Thumbs.db
 resources/android/**/*
 
 android/app/release
+
+src/environments/*
+.firebase/
