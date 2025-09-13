@@ -130,19 +130,22 @@ export class LoginPage implements OnInit {
 
               this.getToken().then( (token: any) => {
 
-                console.log(token);
+                console.log("token:", token);
 
                 let updateurl = 'https://www.roma-by-night.it/Castello/wsPHPapp/updateid.php?userid='+ this.user.IDutente+'&id='+token.value;
                   this.http.get(updateurl)
                   .subscribe(res =>  {
                     // updated
                     //alert('Device registered '+token);
+
+                    this.router.navigate(['tabs']);
                   });
 
               });
 
             } else {
                 // OK 
+                this.router.navigate(['tabs']);
             }
           });
 
@@ -168,16 +171,18 @@ export class LoginPage implements OnInit {
 
   public async getToken(): Promise<any> {
 
-    console.log(environment.firebase);
+    console.log("inside get token");
     const options: GetTokenOptions = {
       vapidKey: environment.firebase.vapidKey,
     };
     if (Capacitor.getPlatform() === "web") {
+      console.log("before registering service worker - web");
       options.serviceWorkerRegistration =
-        await navigator.serviceWorker.register("firebase-messaging-sw.js");
+        await navigator.serviceWorker.register("firebase-messaging-sw.js", { type: 'module' });
     }
+    console.log("here");
     const { token } = await FirebaseMessaging.getToken(options);
-    console.log ("token ", token);
+    console.log("get token token ", token);
     return token;
   }
 
