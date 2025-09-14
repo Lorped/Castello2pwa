@@ -19,3 +19,10 @@ const firebaseConfig = {
 
 const app = firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage( (message) => {
+  const channel = new BroadcastChannel('my-channel');
+  channel.postMessage(message);
+  console.log('Message received in background (SW) ', message);
+  // ...
+});

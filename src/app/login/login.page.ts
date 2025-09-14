@@ -6,12 +6,12 @@ import { Router } from '@angular/router';
 
 
 
-
+import { AlertController } from '@ionic/angular';
 
 
 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getMessaging, getToken, onMessage , Messaging} from '@angular/fire/messaging';
+import { getMessaging, getToken, onMessage , Messaging, } from '@angular/fire/messaging';
 import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 
@@ -42,7 +42,7 @@ export class LoginPage implements OnInit {
 
 
 
-  constructor(public userservice: UserService, private user: User, public router: Router, public status: Status, public http: HttpClient ,  private mesg: AngularFireMessaging) { }
+  constructor(public userservice: UserService, private user: User, public router: Router, public status: Status, public http: HttpClient ,  private mesg: AngularFireMessaging, public alertCtrl: AlertController) { }
 
   ngOnInit() {
     var ee = window.localStorage.getItem( "castellouserid" ) ! ;
@@ -54,6 +54,18 @@ export class LoginPage implements OnInit {
     if (ee != null )  { 
       this.login.controls.checked.setValue(true); 
     }
+
+    const channel = new window.BroadcastChannel('my-channel');
+    channel.addEventListener('message', (event: any) => {
+      //console.log("Received message from SW:", event.data);
+      this.userservice.getuser().subscribe(
+        data => {
+          this.user.Sanita = Number(data.Sanita);
+          this.user.Miti = Number(data.Miti);
+          this.user.PF = Number(data.PF);
+        }
+      );
+    });
 
   }
 
@@ -116,13 +128,39 @@ export class LoginPage implements OnInit {
               this.mesg.requestToken.subscribe(
                 (currentToken) => {
                   if (currentToken) {
-                      console.log("current token:", currentToken);
+                      //console.log("current token:", currentToken);
                       // Send the token to your server or use it as needed
                       let updateurl = 'https://www.roma-by-night.it/Castello/wsPHPapp/updateid.php?userid='+ this.user.IDutente+'&id='+currentToken;
                       this.http.get(updateurl).subscribe(res =>  {
                         // updated
-                        //alert('Device registered '+currentToken);
-                        console.log("updated");
+                        //console.log("updated");
+
+                      const messaging = getMessaging();
+                      //console.log("messaging:", messaging);
+
+
+
+                      this.mesg.messages.subscribe((message) => { 
+                        //console.log(message); 
+                        
+                        this.showalert(message.notification?.body);
+
+                          const channel = new BroadcastChannel('my-channel2');
+                          channel.postMessage(message);
+                  
+                        this.userservice.getuser().subscribe(
+                          data => {
+                            this.user.Sanita = Number(data.Sanita);
+                            this.user.Miti = Number(data.Miti);
+                            this.user.PF = Number(data.PF);
+                          }
+                        );
+  
+                      });
+
+
+
+
                         this.router.navigate(['tabs']);
                       });
 
@@ -157,6 +195,15 @@ export class LoginPage implements OnInit {
         }
       }
     );
+  }
+
+    async showalert(pot: any){
+    let alert =  await this.alertCtrl.create({
+      header: 'CASTELLO',
+      subHeader: pot,
+      buttons: ['OK']
+    });
+    alert.present();
   }
 
 

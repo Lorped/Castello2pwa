@@ -74,4 +74,5 @@ resources/android/**/*
 android/app/release
 
 src/environments/*
-.firebase/
+.firebase/*
+*.cache

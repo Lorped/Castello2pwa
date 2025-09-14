@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Scan, User , Messaggio } from '../global';
 import { UserService } from '../user.service';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
@@ -8,12 +8,24 @@ import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss']
 })
-export class Tab3Page {
+export class Tab3Page implements OnInit {
 
   scanlist: Array<Scan> = [];
   messaggi: Array<Messaggio> = [];
 
   constructor(public user: User, public userservice: UserService, private iab: InAppBrowser) {}
+
+  ngOnInit(){
+
+    const channel = new window.BroadcastChannel('my-channel2');
+    channel.addEventListener('message', (event: any) => {
+      console.log("Received message from channel 2:", event.data);
+      this.loadscan();
+    });
+
+
+
+  }
 
 
   ionViewWillEnter () {
