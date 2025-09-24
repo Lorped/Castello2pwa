@@ -48,7 +48,8 @@ export class Tab3Page implements OnInit {
 
   openMessaggio(url: string) {
     // Implementa la logica per aprire il messaggio
-    this.iab.create(url,'_system');
+    //this.iab.create(url,'_system');
+    window.open(url, "_blank");
   }
 }
  
