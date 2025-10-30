@@ -15,7 +15,7 @@ export class User {
     public Sanita: number;
     public PF: number;
     public URLimg: string;
-    public registratioID: string; //non usato
+    public registrationID: string; //non usato
     public IDbp: number;
     public descbp: string; //from LEFT JOIN
     public gg: number;
@@ -39,7 +39,7 @@ export class User {
         this.Sanita = 10;
         this.PF = 3;
         this.URLimg = "assets/imgs/nopicture.gif";
-        this.registratioID = ''; //non usato
+        this.registrationID = ''; //non usato
         this.IDbp = 0;
         this.descbp = ''; //from LEFT JOIN
         this.gg = 1;
@@ -75,14 +75,18 @@ export class DescOggetto {
     public deltapf = 0;
     public newsan = 0 ;
     public newmiti = 0;
-    public newpf = 0; 
-  
+    public newpf = 0;
+
     public domanda = '';
     public r1 = '';
     public r2 = '';
     public rispsan = 0;
     public rispmiti = 0;
     public risppf = 0;
+
+    public richiesta = '';
+    public password = '';
+    public passwdok = '';
   }
   
   export class Scan  {
@@ -93,7 +97,7 @@ export class DescOggetto {
     public descrizione = ''; // base
   }
 
-    export class Messaggio  {
+  export class Messaggio  {
     public data = '';
     public testo = ''; // base
     public url = '';

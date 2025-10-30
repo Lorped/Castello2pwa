@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Barcode, BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AlertController } from '@ionic/angular';
 import { Oggetto, Status, User } from '../global';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab2',
@@ -17,7 +16,7 @@ export class Tab2Page implements OnInit{
   public barcodes: Barcode[] = [];
   public isPermissionGranted = false;
 
-  constructor(public alertController: AlertController, public oggetto: Oggetto, public status: Status, public user: User, public router: Router) {
+  constructor(public alertController: AlertController, public oggetto: Oggetto, public status: Status, public user: User) {
     this.initialstuff();
   }
 
@@ -56,21 +55,32 @@ export class Tab2Page implements OnInit{
   }
 
   async openbarcode() {
-    this.router.navigate(['/qrscanner']);
-    return; 
-    
-    
 
-    // this.oggetto.id='504756580060';
-    // this.router.navigate(['/tabs/oggetto']);
+    //   DEGUG !!!!
+    /***************
+    this.oggetto.id='358035692152';
+
+    if (this.oggetto.id.substring(0,1)=='M'){
+      this.status.magie = true ;
+      this.status.generico = false;
+      
+    } else {
+      this.status.magie = false ;
+      this.status.generico = true;
+    }
+    return ;
+    ****************/
+    //this.router.navigate(['/tabs/oggetto']);
+    /****************/
+    //   FINE DEBUG !!!!
+
+
     this.barcodes = [];
 
 
-    /**************    
+
     const { barcodes } = await BarcodeScanner.scan();
     this.barcodes.push(...barcodes);
-
-    **************    */
 
 
     this.oggetto.id=this.barcodes[0].rawValue;
