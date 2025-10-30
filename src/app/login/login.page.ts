@@ -103,8 +103,8 @@ export class LoginPage implements OnInit {
           this.user.mm = resp.user.mm;
           this.user.nomeprofessione = resp.user.nomeprofessione;
           this.user.nomespecial = resp.user.nomespecial;
-          this.user.registratioID = resp.user.registratioID;
-          this.user.xbonus = resp.user.registratioID;
+          this.user.registrationID = resp.user.registrationID;
+          this.user.xbonus = resp.user.xbonus;
           this.user.xspecpg = resp.user.xspecpg;
         
 
