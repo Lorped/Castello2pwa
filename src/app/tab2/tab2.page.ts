@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Barcode, BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AlertController } from '@ionic/angular';
 import { Oggetto, Status, User } from '../global';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab2',
@@ -16,7 +17,7 @@ export class Tab2Page implements OnInit{
   public barcodes: Barcode[] = [];
   public isPermissionGranted = false;
 
-  constructor(public alertController: AlertController, public oggetto: Oggetto, public status: Status, public user: User) {
+  constructor(public alertController: AlertController, public oggetto: Oggetto, public status: Status, public user: User, public router: Router) {
     this.initialstuff();
   }
 
@@ -32,10 +33,10 @@ export class Tab2Page implements OnInit{
     let { available } = await BarcodeScanner.isGoogleBarcodeScannerModuleAvailable();
  
     if (available == false ){
-      // alert("debug: module not available");
+      alert("debug: module not available");
       await BarcodeScanner.installGoogleBarcodeScannerModule();
     } else {
-      // alert("debug: module available");
+      alert("debug: module available");
     }
     
   }
@@ -55,6 +56,8 @@ export class Tab2Page implements OnInit{
   }
 
   async openbarcode() {
+      this.router.navigate(['/qrscanner']);
+     return;
 
     //   DEGUG !!!!
     /***************
