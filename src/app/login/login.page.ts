@@ -121,6 +121,14 @@ export class LoginPage implements OnInit {
         console.log("Firebase app initialized:");
 
 
+        if( 'Notification' in window){
+          //this.router.navigate(['tabs']);
+        } else {
+          alert ("Notifiche non supportate!");
+          this.router.navigate(['tabs']);
+        }
+
+
         Notification.requestPermission().then((permission) => {
           if (permission === 'granted') {
               console.log('Notification permission granted.');
