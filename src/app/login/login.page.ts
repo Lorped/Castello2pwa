@@ -26,9 +26,10 @@ import { HttpClient } from '@angular/common/http';
 import { FirebaseApp } from '@angular/fire/compat';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+    selector: 'app-login',
+    templateUrl: './login.page.html',
+    styleUrls: ['./login.page.scss'],
+    standalone: false
 })
 export class LoginPage implements OnInit {
       
