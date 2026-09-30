@@ -1,6 +1,18 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { UserService } from '../user.service';
 import { Oggetto, Status, User , DescOggetto} from '../global';
+import { FormsModule } from '@angular/forms';
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonCol,
+  IonInput,
+  IonRow,
+} from '@ionic/angular';
 
 
 
@@ -9,8 +21,19 @@ import { Oggetto, Status, User , DescOggetto} from '../global';
     selector: 'app-oggetto',
     templateUrl: './oggetto.component.html',
     styleUrls: ['./oggetto.component.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+      FormsModule,
+      IonButton,
+      IonCard,
+      IonCardContent,
+      IonCardHeader,
+      IonCardSubtitle,
+      IonCardTitle,
+      IonCol,
+      IonInput,
+      IonRow,
+    ]
 })
 export class OggettoComponent  implements OnInit {
 
@@ -24,7 +47,7 @@ export class OggettoComponent  implements OnInit {
 
   NumRisposte = 1;
 
-  constructor( public userservice: UserService, public oggetto: Oggetto, public status: Status, public user: User) { }
+  constructor( public userservice: UserService, public oggetto: Oggetto, public status: Status, public user: User, private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit() {
 
@@ -41,6 +64,7 @@ export class OggettoComponent  implements OnInit {
         if(this.newoggetto.domanda != '') {
           this.flagdomanda = 1;
         }
+        this.changeDetectorRef.markForCheck();
       }
     );
   }
@@ -63,6 +87,7 @@ export class OggettoComponent  implements OnInit {
         this.user.PF = data.pf;
 
         this.flagsi = 1;
+        this.changeDetectorRef.markForCheck();
       }
     );
     
@@ -75,6 +100,7 @@ export class OggettoComponent  implements OnInit {
       (data) => {
         //console.log(data);
         this.flagno = 1;
+        this.changeDetectorRef.markForCheck();
       }
     );
   }
@@ -86,6 +112,7 @@ export class OggettoComponent  implements OnInit {
         (data) => {
         //console.log(data);
           this.rispok = 1;     
+          this.changeDetectorRef.markForCheck();
         }
       );
     } else {

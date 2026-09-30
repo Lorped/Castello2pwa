@@ -1,5 +1,17 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { ToastController, LoadingController, Platform } from '@ionic/angular';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import {
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonTitle,
+  IonToolbar,
+  LoadingController,
+  Platform,
+  ToastController,
+} from '@ionic/angular';
 import jsQR from 'jsqr';
 import { Oggetto, Status } from '../global';
 import { Router } from '@angular/router';
@@ -8,8 +20,17 @@ import { Router } from '@angular/router';
     selector: 'app-qrscanner',
     templateUrl: './qrscanner.page.html',
     styleUrls: ['./qrscanner.page.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+      IonBackButton,
+      IonButton,
+      IonButtons,
+      IonContent,
+      IonHeader,
+      IonIcon,
+      IonTitle,
+      IonToolbar,
+    ]
 })
 export class QrscannerPage implements OnInit {
   @ViewChild('video', { static: false }) video?: ElementRef;
@@ -31,7 +52,8 @@ export class QrscannerPage implements OnInit {
     private plt: Platform,
     public oggetto: Oggetto,
     public router: Router, 
-    public status: Status
+    public status: Status,
+    private changeDetectorRef: ChangeDetectorRef
   ) { 
     const isInStandaloneMode = () =>
       'standalone' in window.navigator && window.navigator['standalone'];
@@ -72,10 +94,12 @@ export class QrscannerPage implements OnInit {
 
   reset() {
     this.scanResult = null;
+    this.changeDetectorRef.markForCheck();
   }
 
   stopScan() {
     this.scanActive = false;
+    this.changeDetectorRef.markForCheck();
   }
 
   async startScan() {
@@ -101,6 +125,7 @@ export class QrscannerPage implements OnInit {
         await this.loading.dismiss();
         //this.loading = null;
         this.scanActive = true;
+        this.changeDetectorRef.markForCheck();
       }
   
       this.canvasElement.height = this.videoElement.videoHeight;
@@ -136,6 +161,7 @@ export class QrscannerPage implements OnInit {
           this.status.magie = false ;
           this.status.generico = true;
         }
+        this.changeDetectorRef.markForCheck();
 
         //alert("Scanned "+ this.oggetto.id);
         this.router.navigate(['/tabs/tab2']);

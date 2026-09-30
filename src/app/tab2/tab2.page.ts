@@ -1,15 +1,42 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Barcode, BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
-import { AlertController } from '@ionic/angular';
+import {
+  AlertController,
+  IonButton,
+  IonCard,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonCol,
+  IonContent,
+  IonHeader,
+  IonRow,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular';
 import { Oggetto, Status, User } from '../global';
 import { Router } from '@angular/router';
+import { OggettoComponent } from '../oggetto/oggetto.component';
+import { MagiaComponent } from '../magia/magia.component';
 
 @Component({
     selector: 'app-tab2',
     templateUrl: 'tab2.page.html',
     styleUrls: ['tab2.page.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+      IonButton,
+      IonCard,
+      IonCardSubtitle,
+      IonCardTitle,
+      IonCol,
+      IonContent,
+      IonHeader,
+      IonRow,
+      IonTitle,
+      IonToolbar,
+      OggettoComponent,
+      MagiaComponent,
+    ]
 })
 export class Tab2Page implements OnInit{
 

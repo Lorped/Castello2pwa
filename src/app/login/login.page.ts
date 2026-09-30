@@ -1,18 +1,30 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { UserService } from '../user.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Status, User } from '../global';
 import { Router } from '@angular/router';
 
 
 
-import { AlertController } from '@ionic/angular';
+import {
+  AlertController,
+  IonButton,
+  IonCheckbox,
+  IonCol,
+  IonContent,
+  IonHeader,
+  IonInput,
+  IonInputPasswordToggle,
+  IonItem,
+  IonRow,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
 
 
+import { initializeApp } from 'firebase/app';
 
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getMessaging, getToken, onMessage , Messaging, } from '@angular/fire/messaging';
-import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 
 
@@ -23,14 +35,31 @@ import { environment } from "src/environments/environment";
 
 
 import { HttpClient } from '@angular/common/http';
-import { FirebaseApp } from '@angular/fire/compat';
+import {
+  FirebaseMessaging,
+  GetTokenOptions,
+} from '@capacitor-firebase/messaging';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.page.html',
     styleUrls: ['./login.page.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+      FormsModule,
+      ReactiveFormsModule,
+      IonButton,
+      IonCheckbox,
+      IonCol,
+      IonContent,
+      IonHeader,
+      IonInput,
+      IonInputPasswordToggle,
+      IonItem,
+      IonRow,
+      IonTitle,
+      IonToolbar,
+    ]
 })
 export class LoginPage implements OnInit {
       
@@ -44,7 +73,7 @@ export class LoginPage implements OnInit {
 
 
 
-  constructor(public userservice: UserService, private user: User, public router: Router, public status: Status, public http: HttpClient ,  private mesg: AngularFireMessaging, public alertCtrl: AlertController) { }
+  constructor(public userservice: UserService, private user: User, public router: Router, public status: Status, public http: HttpClient ,   public alertCtrl: AlertController) { }
 
   ngOnInit() {
     var ee = window.localStorage.getItem( "castellouserid" ) ! ;
@@ -117,76 +146,34 @@ export class LoginPage implements OnInit {
 
         // Request permission to use push notifications
 
-        provideFirebaseApp(() => initializeApp(environment.firebase));
-        // initializeApp(environment.firebase);
+        this.pushsetup();
 
-        console.log("Firebase app initialized:");
-
-
-        if( 'Notification' in window){
-          //this.router.navigate(['tabs']);
-        } else {
-          alert ("Notifiche non supportate!");
-          this.router.navigate(['tabs']);
-        }
-
-
-        Notification.requestPermission().then((permission) => {
-          if (permission === 'granted') {
-              console.log('Notification permission granted.');
-    
-              this.mesg.requestToken.subscribe(
-                (currentToken) => {
-                  if (currentToken) {
-                      //console.log("current token:", currentToken);
-                      // Send the token to your server or use it as needed
-                      let updateurl = 'https://www.roma-by-night.it/Castello/wsPHPapp/updateid.php?userid='+ this.user.IDutente+'&id='+currentToken;
-                      this.http.get(updateurl).subscribe(res =>  {
-                        // updated
-                        //console.log("updated");
-
-                      const messaging = getMessaging();
-                      //console.log("messaging:", messaging);
-
-
-
-                      this.mesg.messages.subscribe((message) => { 
-                        //console.log(message); 
-                        
-                        this.showalert(message.notification?.body);
-
-                          const channel = new BroadcastChannel('my-channel2');
-                          channel.postMessage(message);
-                  
-                        this.userservice.getuser().subscribe(
-                          data => {
-                            this.user.Sanita = Number(data.Sanita);
-                            this.user.Miti = Number(data.Miti);
-                            this.user.PF = Number(data.PF);
-                          }
-                        );
   
-                      });
 
 
+          /*
+          this.mesg.messages.subscribe((message) => { 
+            
+            this.showalert(message.notification?.body);
+
+              const channel = new BroadcastChannel('my-channel2');
+              channel.postMessage(message);
+      
+            this.userservice.getuser().subscribe(
+              data => {
+                this.user.Sanita = Number(data.Sanita);
+                this.user.Miti = Number(data.Miti);
+                this.user.PF = Number(data.PF);
+              }
+            );
+
+          });
+
+          */
 
 
-                        this.router.navigate(['tabs']);
-                      });
-
-                  } else {
-                    console.log('No registration token available.');
-                    this.router.navigate(['tabs']);
-                  }
-                },
-                (error) => {
-                  console.log(error);
-                });
-          } else {
-            console.log('Notification permission denied.');
-            this.router.navigate(['tabs']);
-          }
-        });
+        this.router.navigate(['tabs']);
+      
 
           
 
@@ -215,6 +202,38 @@ export class LoginPage implements OnInit {
     });
     alert.present();
   }
+
+async pushsetup() {
+    try {
+      const permissions = await FirebaseMessaging.requestPermissions();
+      if (permissions.receive === 'granted') {
+        const token = await this.getToken();
+        this.http
+          .get(
+            `https://www.roma-by-night.it/Castello/wsPHPapp/updateid.php?userid=${this.user.IDutente}&id=${token}`
+          )
+          .subscribe();
+      }
+    } catch (error) {
+      console.error('Unable to configure push notifications', error);
+    }
+
+    await this.router.navigate(['tabs']);
+  }
+
+    private async getToken(): Promise<string> {
+    const options: GetTokenOptions = {
+      vapidKey: environment.firebase.vapidKey,
+    };
+    if (Capacitor.getPlatform() === 'web') {
+      options.serviceWorkerRegistration =
+        await navigator.serviceWorker.register('firebase-messaging-sw.js');
+    }
+    const { token } = await FirebaseMessaging.getToken(options);
+    return token;
+  }
+
+
 
 
 }

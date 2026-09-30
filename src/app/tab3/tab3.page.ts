@@ -1,14 +1,37 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Scan, User , Messaggio } from '../global';
 import { UserService } from '../user.service';
-import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
+import { Browser } from '@capacitor/browser';
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular';
 
 @Component({
     selector: 'app-tab3',
     templateUrl: 'tab3.page.html',
     styleUrls: ['tab3.page.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+      IonButton,
+      IonCard,
+      IonCardContent,
+      IonCardHeader,
+      IonCardSubtitle,
+      IonCardTitle,
+      IonContent,
+      IonHeader,
+      IonTitle,
+      IonToolbar,
+    ]
 })
 export class Tab3Page implements OnInit {
 
@@ -16,7 +39,7 @@ export class Tab3Page implements OnInit {
   messaggi: Array<Messaggio> = [];
   timeline: Array<{ tipo: 'scan', data: string, timestamp: number, scan: Scan } | { tipo: 'messaggio', data: string, timestamp: number, messaggio: Messaggio }> = [];
 
-  constructor(public user: User, public userservice: UserService, private iab: InAppBrowser) {}
+  constructor(public user: User, public userservice: UserService, private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(){
 
@@ -46,6 +69,7 @@ export class Tab3Page implements OnInit {
         ...this.scanlist.map(scan => ({ tipo: 'scan' as const, data: scan.datascan, timestamp: Number(scan.timestamp), scan })),
         ...this.messaggi.map(messaggio => ({ tipo: 'messaggio' as const, data: messaggio.data, timestamp: Number(messaggio.timestamp), messaggio })),
       ].sort((a, b) => b.timestamp - a.timestamp);
+      this.changeDetectorRef.markForCheck();
       //console.log(this.scanlist);
     });
   }
