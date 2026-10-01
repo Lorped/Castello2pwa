@@ -20,12 +20,29 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-/*
-messaging.onBackgroundMessage( (message) => {
-  const channel = new BroadcastChannel('my-channel');
-  channel.postMessage(message);
-  console.log('Message received in background (SW) ', message);
-  // ...
+messaging.onBackgroundMessage((payload) => {
+  const notificationTitle = payload.notification?.title ?? 'Castello';
+  const notificationOptions = {
+    body: payload.notification?.body ?? '',
+    icon: '/icons/icon-192x192.png',
+    data: payload.data,
+  };
 
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
-*/
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
+  );
+});

@@ -23,12 +23,13 @@ import {
 import { Capacitor } from '@capacitor/core';
 
 
-import { initializeApp } from 'firebase/app';
+import { initializeApp,  } from 'firebase/app';
+import { isSupported, getMessaging, onMessage, getToken } from 'firebase/messaging';
+import { Subject } from 'rxjs';
 
 
 
-
-import { environment } from "src/environments/environment";
+import { environment } from "../../environments/environment";
 
 
 
@@ -70,8 +71,8 @@ export class LoginPage implements OnInit {
     checked: new FormControl(false),
   });
 
-
-
+    private messageReceived = new Subject<any>();
+    message$ = this.messageReceived.asObservable();
 
   constructor(public userservice: UserService, private user: User, public router: Router, public status: Status, public http: HttpClient ,   public alertCtrl: AlertController) { }
 
@@ -148,35 +149,8 @@ export class LoginPage implements OnInit {
 
         this.pushsetup();
 
-  
-
-
-          /*
-          this.mesg.messages.subscribe((message) => { 
-            
-            this.showalert(message.notification?.body);
-
-              const channel = new BroadcastChannel('my-channel2');
-              channel.postMessage(message);
-      
-            this.userservice.getuser().subscribe(
-              data => {
-                this.user.Sanita = Number(data.Sanita);
-                this.user.Miti = Number(data.Miti);
-                this.user.PF = Number(data.PF);
-              }
-            );
-
-          });
-
-          */
-
-
         this.router.navigate(['tabs']);
-      
-
-          
-
+    
 
       }, 
       error => {
@@ -204,35 +178,57 @@ export class LoginPage implements OnInit {
   }
 
 async pushsetup() {
-    try {
-      const permissions = await FirebaseMessaging.requestPermissions();
-      if (permissions.receive === 'granted') {
-        const token = await this.getToken();
+
+  // emette ad ogni notifica push ricevuta in foreground
+
+try {
+      if (!(await isSupported())) {
+        console.warn('Le notifiche push non sono supportate su questo browser/dispositivo');
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        console.warn('Permesso per le notifiche push negato dall\'utente');
+        return;
+      }
+
+      const app = initializeApp(environment.firebase);
+      const messaging = getMessaging(app);
+
+      onMessage(messaging, (payload) => {
+        //alert('Notifica push ricevuta in foreground: ' + JSON.stringify(payload));
+        //console.log('Notifica push ricevuta in foreground', payload);
+        this.messageReceived.next(payload);
+      });
+
+      const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js', {
+        scope: '/firebase-messaging-scope/',
+      });
+
+      const token = await getToken(messaging, {
+        vapidKey: environment.firebase.vapidKey,
+        serviceWorkerRegistration: registration,
+      });
+
+      this.saveToken(this.user.IDutente, token);
+    } catch (error) {
+      console.error('Impossibile configurare le notifiche push', error);
+    }
+
+
+  }
+
+  private saveToken(user_id: number, token: string) {
+    // Endpoint non ancora disponibile: il backend PHP verrà sviluppato in seguito
         this.http
           .get(
             `https://www.roma-by-night.it/Castello/wsPHPapp/updateid.php?userid=${this.user.IDutente}&id=${token}`
-          )
-          .subscribe();
-      }
-    } catch (error) {
-      console.error('Unable to configure push notifications', error);
-    }
-
-    await this.router.navigate(['tabs']);
+          ).subscribe({
+      next: () => console.log('Token push salvato'),
+      error: (error) => console.error('Errore nel salvataggio del token push', error),
+    });
   }
-
-    private async getToken(): Promise<string> {
-    const options: GetTokenOptions = {
-      vapidKey: environment.firebase.vapidKey,
-    };
-    if (Capacitor.getPlatform() === 'web') {
-      options.serviceWorkerRegistration =
-        await navigator.serviceWorker.register('firebase-messaging-sw.js');
-    }
-    const { token } = await FirebaseMessaging.getToken(options);
-    return token;
-  }
-
 
 
 
