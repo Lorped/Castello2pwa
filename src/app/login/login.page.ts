@@ -20,7 +20,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular';
-import { Capacitor } from '@capacitor/core';
+
 
 
 import { initializeApp,  } from 'firebase/app';
@@ -32,10 +32,8 @@ import { Subject } from 'rxjs';
 import { environment } from "../../environments/environment";
 
 
-
-
-
 import { HttpClient } from '@angular/common/http';
+
 import {
   FirebaseMessaging,
   GetTokenOptions,
